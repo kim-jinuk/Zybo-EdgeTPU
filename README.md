@@ -110,7 +110,8 @@ Edge TPU 미검출 시 --cpu 옵션으로 강제 CPU 추론.
 ---
 
 ## 5. 핵심 모듈
-| 모듈            | 경로                            | 역할              |
+| 모듈            | 파일/폴더                       | 주요 기능          |
+| --------------- | ------------------------------ | ----------------  |
 | FrameCapture    | src/python/pipeline/capture.py | V4L2 캡처 스레드   |
 | DeblurLite      | src/python/ai/deblurgan.py     | DeblurGAN-v2 Lite |
 | SRLite          | src/python/ai/srgan.py         | ESRGAN-tiny       |
@@ -119,6 +120,15 @@ Edge TPU 미검출 시 --cpu 옵션으로 강제 CPU 추론.
 | Annotator       | src/cpp/annot/                 | 박스·궤적 그리기    |
 | VideoWriter     | src/python/pipeline/output.py  | MJPEG / H.264 저장 |
 
+Pipeline	src/python/main.py	스레드 생성·전체 파이프라인 제어
+Capture	src/python/pipeline/capture.py	V4L2 / CSI 프레임 캡처 (Thread 1)
+Deblur	src/python/ai/deblurgan.py	DeblurGAN-v2 Lite TFLite 추론
+Super-Res	src/python/ai/srgan.py	ESRGAN-tiny TFLite 추론
+Detector	src/python/ai/detector.py	MobileNet-SSD Edge TPU 추론
+Tracker	src/cpp/tracker/	KCF / SORT / 칼만필터 구현 (Thread 2 내부)
+Annotator	src/cpp/annot/	박스·ID·궤적 오버레이
+Output	src/python/pipeline/output.py	디스플레이 & VideoWriter (Thread 3)
+Utils	src/python/utils/	FPS 계측, 로그, 설정 파서 등
 각 모듈은 TODO: 주석으로 구현 포인트가 표시돼 있습니다.
 
 ---
