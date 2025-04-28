@@ -1,0 +1,9 @@
+camera:
+  width: 640
+  height: 480
+  fps: 30
+queue: 4
+deblur_model: models/deblurgan_lite.tflite
+sr_model: models/esrgan_tiny.tflite
+det_model: models/ssd_mobilenet_v2_edgetpu.tflite
+det_thresh: 0.5
