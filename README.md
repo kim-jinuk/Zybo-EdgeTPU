@@ -57,6 +57,8 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 │   │   └── camera_capture.py            # Thread‑1: V4L2 / OpenCV 프레임 캡처
 │   ├── python/
 │   │   └── main.py                      # 데모 실행
+│   ├── cpp/
+│   │   └── CMakeLists.txt              # (예시)
 │   ├── processing/
 │   │   ├── deblurring.py               # DeblurGAN‑v2 Lite 추론 래퍼
 │   │   └── super_resolution.py         # ESRGAN‑tiny 추론 래퍼
