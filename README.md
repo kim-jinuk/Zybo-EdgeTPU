@@ -122,7 +122,7 @@ Edge TPU 미검출 시 --cpu 옵션으로 강제 CPU 추론.
 | Tracker          | src/tracking/sort_tracker.py           | IoU + 칼만필터(SORT) 구현                          |
 | MultiTracker     | src/tracking/multi_tracker.py          | KCF/CSRT MultiTracker 래퍼                         |
 | Pipeline         | src/pipeline/pipeline.py               | Thread‑2: 전체 파이프라인 조립                      |
-| Output           | src/pipeline/output.py                 | Thread‑3: 디스플레이 & VideoWriter (Thread 3)      |
+| Output           | src/pipeline/output.py                 | Thread‑3: 디스플레이 & VideoWriter                 |
 | Utils            | src/utils/                             | FPS 계측, 로그, 설정 파서 등                        |
 
 각 모듈은 TODO: 주석으로 구현 포인트가 표시돼 있습니다.
