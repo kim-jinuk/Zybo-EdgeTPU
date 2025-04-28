@@ -55,6 +55,8 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 ├── src/
 │   ├── capture/
 │   │   └── camera_capture.py            # Thread‑1: V4L2 / OpenCV 프레임 캡처
+│   ├── python/
+│   │   └── main.py                      # 데모 실행
 │   ├── processing/
 │   │   ├── deblurring.py               # DeblurGAN‑v2 Lite 추론 래퍼
 │   │   └── super_resolution.py         # ESRGAN‑tiny 추론 래퍼
@@ -64,6 +66,7 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 │   │   ├── sort_tracker.py             # IoU + 칼만필터(SORT) 구현
 │   │   └── multi_tracker.py            # KCF/CSRT MultiTracker 래퍼
 │   ├── pipeline/
+│   │   ├── ouptut.py                   # Thread‑2: 전체 파이프라인 조립
 │   │   └── pipeline.py                 # Thread‑2: 전체 파이프라인 조립
 │   └── utils/
 │       ├── config.py                   # YAML/JSON 설정 로더
@@ -80,8 +83,8 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 
 ### 4-1. 저장소 클론
 ```bash
-git clone https://github.com/your-id/zybo_eo_rt.git
-cd zybo_eo_rt
+git clone https://github.com/kim-jinuk/Zybo-EdgeTPU.git
+cd Zybo-EdgeTPU
 git submodule update --init
 ```
 
@@ -110,26 +113,18 @@ Edge TPU 미검출 시 --cpu 옵션으로 강제 CPU 추론.
 ---
 
 ## 5. 핵심 모듈
-| 모듈             | 파일/폴더                        | 주요 기능                       |
-| ---------------- | -------------------------------- | ------------------------------  |
-| FrameCapture     | src/capture/camera_capture.py    | Thread‑1: V4L2 / OpenCV 프레임 캡처       |
-| DeblurLite       | src/processing/deblurring.py       | DeblurGAN‑v2 Lite 추론 래퍼               |
-| SRLite           | src/processing/super_resolution.py           | ESRGAN‑tiny 추론 래퍼                     |
-| EdgeTPUDetector  | src/detection/tpu_detection.py        | Edge‑TPU MobileNet‑SSD 추론 래퍼                |
-| Tracker          | src/tracking/sort_tracker.py                 | IoU + 칼만필터(SORT) 구현                  |
-| Tracker          | src/tracking/multi_tracker.py                 | KCF/CSRT MultiTracker 래퍼                  |
-| Pipeline         | src/pipeline/pipeline.py                   | Thread‑2: 전체 파이프라인 조립         |
-| VideoWriter      | src/python/pipeline/output.py    | MJPEG / H.264 저장               |
+| 모듈             | 파일/폴더                              | 주요 기능                                          |
+| ---------------- | -------------------------------------- | ------------------------------------------------  |
+| FrameCapture     | src/capture/camera_capture.py          | Thread‑1: V4L2 / OpenCV 프레임 캡처                |
+| DeblurLite       | src/processing/deblurring.py           | DeblurGAN‑v2 Lite 추론 래퍼                        |
+| SRLite           | src/processing/super_resolution.py     | ESRGAN‑tiny 추론 래퍼                              |
+| EdgeTPUDetector  | src/detection/tpu_detection.py         | Edge‑TPU MobileNet‑SSD 추론 래퍼                   |
+| Tracker          | src/tracking/sort_tracker.py           | IoU + 칼만필터(SORT) 구현                          |
+| MultiTracker     | src/tracking/multi_tracker.py          | KCF/CSRT MultiTracker 래퍼                         |
+| Pipeline         | src/pipeline/pipeline.py               | Thread‑2: 전체 파이프라인 조립                      |
+| Output           | src/pipeline/output.py                 | Thread‑3: 디스플레이 & VideoWriter (Thread 3)      |
+| Utils            | src/utils/                             | FPS 계측, 로그, 설정 파서 등                        |
 
-Pipeline	src/python/main.py	스레드 생성·전체 파이프라인 제어
-Capture	src/python/pipeline/capture.py	V4L2 / CSI 프레임 캡처 (Thread 1)
-Deblur	src/python/ai/deblurgan.py	DeblurGAN-v2 Lite TFLite 추론
-Super-Res	src/python/ai/srgan.py	ESRGAN-tiny TFLite 추론
-Detector	src/python/ai/detector.py	MobileNet-SSD Edge TPU 추론
-Tracker	src/cpp/tracker/	KCF / SORT / 칼만필터 구현 (Thread 2 내부)
-Annotator	src/cpp/annot/	박스·ID·궤적 오버레이
-Output	src/python/pipeline/output.py	디스플레이 & VideoWriter (Thread 3)
-Utils	src/python/utils/	FPS 계측, 로그, 설정 파서 등
 각 모듈은 TODO: 주석으로 구현 포인트가 표시돼 있습니다.
 
 ---
