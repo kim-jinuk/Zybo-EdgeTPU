@@ -108,8 +108,7 @@ ninja && sudo ninja install      # libvision_core.so
 
 ### 4-4. 데모 실행
 ```bash
-python src/python/main.py --source 0 \
-       --model models/ssd_mobilenet_v2_edgetpu.tflite
+python scripts/run_pipeline.py --cfg config/pipeline.yaml --source 0
 ```
 
 기본값: 30 FPS, 640×480. \
