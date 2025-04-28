@@ -66,7 +66,7 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 │   │   ├── sort_tracker.py             # IoU + 칼만필터(SORT) 구현
 │   │   └── multi_tracker.py            # KCF/CSRT MultiTracker 래퍼
 │   ├── pipeline/
-│   │   ├── ouptut.py                   # Thread‑2: 전체 파이프라인 조립
+│   │   ├── ouptut.py                   # Thread‑3: 디스플레이 & VideoWriter
 │   │   └── pipeline.py                 # Thread‑2: 전체 파이프라인 조립
 │   └── utils/
 │       ├── config.py                   # YAML/JSON 설정 로더
