@@ -76,7 +76,6 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 ├── scripts/
 │   ├── run_pipeline.py                 # 파이프라인 실행 엔트리
 │   └── benchmark.py                    # FPS/Latency 벤치마크
-└── build/                              # (CMake 아웃풋)
 ├── config/
 │   └── pipeline.yaml                   # 파이프라인 configurations
 └── build/                              # (CMake 아웃풋)
