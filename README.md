@@ -72,6 +72,7 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 │   ├── run_pipeline.py          # 파이프라인 실행 엔트리
 │   └── benchmark.py             # FPS/Latency 벤치마크
 └── build/                       # (CMake 아웃풋)
+```
 
 ---
 
@@ -82,22 +83,29 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 git clone https://github.com/your-id/zybo_eo_rt.git
 cd zybo_eo_rt
 git submodule update --init
+```
 
 ### 4-2. Python 환경
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+```
 
 ### 4-3. C++ 모듈 빌드
 ```bash
 mkdir build && cd build
 cmake -GNinja ..
 ninja && sudo ninja install      # libvision_core.so
+```
 
 ### 4-4. 데모 실행
 ```bash
 python src/python/main.py --source 0 \
        --model models/ssd_mobilenet_v2_edgetpu.tflite
+```
+
+기본값: 30 FPS, 640×480. \
+Edge TPU 미검출 시 --cpu 옵션으로 강제 CPU 추론.
 
 ---
 
@@ -111,6 +119,8 @@ Tracker         | src/cpp/tracker/               | KCF / SORT 추적
 Annotator       | src/cpp/annot/                 | 박스·궤적 그리기
 VideoWriter     | src/python/pipeline/output.py  | MJPEG / H.264 저장
 
+각 모듈은 TODO: 주석으로 구현 포인트가 표시돼 있습니다.
+
 ---
 
 ## 6. 모델 준비
@@ -118,6 +128,9 @@ VideoWriter     | src/python/pipeline/output.py  | MJPEG / H.264 저장
 # COCO MobileNet-SSD Edge TPU 모델 다운로드 & 컴파일
 wget https://dl.google.com/coral/canned_models/ssd_mobilenet_v2_coco_quant_postprocess.tflite -P models
 edgetpu_compiler models/ssd_mobilenet_v2_coco_quant_postprocess.tflite
+```
+
+- 맞춤 클래스 필요 시 TensorFlow OD API로 fine-tune → tflite_convert --quantize → edgetpu_compiler.
 
 ---
 
