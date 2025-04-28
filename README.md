@@ -43,35 +43,35 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 .
 ├── README.md
 ├── .gitignore
-├── requirements.txt              # Python 의존성
-├── setup_env.sh                  # 패키지 설치 스크립트 (pip + apt)
+├── requirements.txt                     # Python 의존성
+├── setup_env.sh                         # 패키지 설치 스크립트 (pip + apt)
 ├── assets/
-│   └── Image1.png                # 데모 영상·이미지
+│   └── Image1.png                       # 데모 영상·이미지
 ├── docker/
-│   └── Dockerfile                # 로컬 개발/테스트용 컨테이너
-├── cmake/                        # C++ 빌드 헬퍼
-│   └── arm-linux-gnueabihf.cmake # Zynq cross‑toolchain 설정
-├── CMakeLists.txt                # C++ 빌드를 최상위에서 관리
+│   └── Dockerfile                       # 로컬 개발/테스트용 컨테이너
+├── cmake/                               # C++ 빌드 헬퍼
+│   └── arm-linux-gnueabihf.cmake        # Zynq cross‑toolchain 설정
+├── CMakeLists.txt                       # C++ 빌드를 최상위에서 관리
 ├── src/
 │   ├── capture/
-│   │   └── camera_capture.py     # Thread‑1: V4L2 / OpenCV 프레임 캡처
+│   │   └── camera_capture.py            # Thread‑1: V4L2 / OpenCV 프레임 캡처
 │   ├── processing/
-│   │   ├── deblurring.py        # DeblurGAN‑v2 Lite 추론 래퍼
-│   │   └── super_resolution.py  # ESRGAN‑tiny 추론 래퍼
+│   │   ├── deblurring.py               # DeblurGAN‑v2 Lite 추론 래퍼
+│   │   └── super_resolution.py         # ESRGAN‑tiny 추론 래퍼
 │   ├── detection/
-│   │   └── tpu_detection.py     # Edge‑TPU MobileNet‑SSD 추론 래퍼
+│   │   └── tpu_detection.py            # Edge‑TPU MobileNet‑SSD 추론 래퍼
 │   ├── tracking/
-│   │   ├── sort_tracker.py      # IoU + 칼만필터(SORT) 구현
-│   │   └── multi_tracker.py     # KCF/CSRT MultiTracker 래퍼
+│   │   ├── sort_tracker.py             # IoU + 칼만필터(SORT) 구현
+│   │   └── multi_tracker.py            # KCF/CSRT MultiTracker 래퍼
 │   ├── pipeline/
-│   │   └── pipeline.py          # Thread‑2: 전체 파이프라인 조립
+│   │   └── pipeline.py                 # Thread‑2: 전체 파이프라인 조립
 │   └── utils/
-│       ├── config.py            # YAML/JSON 설정 로더
-│       └── logger.py            # 공통 로깅 유틸
+│       ├── config.py                   # YAML/JSON 설정 로더
+│       └── logger.py                   # 공통 로깅 유틸
 ├── scripts/
-│   ├── run_pipeline.py          # 파이프라인 실행 엔트리
-│   └── benchmark.py             # FPS/Latency 벤치마크
-└── build/                       # (CMake 아웃풋)
+│   ├── run_pipeline.py                 # 파이프라인 실행 엔트리
+│   └── benchmark.py                    # FPS/Latency 벤치마크
+└── build/                              # (CMake 아웃풋)
 ```
 
 ---
@@ -110,14 +110,14 @@ Edge TPU 미검출 시 --cpu 옵션으로 강제 CPU 추론.
 ---
 
 ## 5. 핵심 모듈
-모듈            | 경로                            | 역할
-FrameCapture    | src/python/pipeline/capture.py | V4L2 캡처 스레드
-DeblurLite      | src/python/ai/deblurgan.py     | DeblurGAN-v2 Lite
-SRLite          | src/python/ai/srgan.py         | ESRGAN-tiny
-EdgeTPUDetector | src/python/ai/detector.py      | MobileNet-SSD v2
-Tracker         | src/cpp/tracker/               | KCF / SORT 추적
-Annotator       | src/cpp/annot/                 | 박스·궤적 그리기
-VideoWriter     | src/python/pipeline/output.py  | MJPEG / H.264 저장
+| 모듈            | 경로                            | 역할              |
+| FrameCapture    | src/python/pipeline/capture.py | V4L2 캡처 스레드   |
+| DeblurLite      | src/python/ai/deblurgan.py     | DeblurGAN-v2 Lite |
+| SRLite          | src/python/ai/srgan.py         | ESRGAN-tiny       |
+| EdgeTPUDetector | src/python/ai/detector.py      | MobileNet-SSD v2  |
+| Tracker         | src/cpp/tracker/               | KCF / SORT 추적    |
+| Annotator       | src/cpp/annot/                 | 박스·궤적 그리기    |
+| VideoWriter     | src/python/pipeline/output.py  | MJPEG / H.264 저장 |
 
 각 모듈은 TODO: 주석으로 구현 포인트가 표시돼 있습니다.
 
