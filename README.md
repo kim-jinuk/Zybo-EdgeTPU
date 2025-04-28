@@ -110,15 +110,16 @@ Edge TPU 미검출 시 --cpu 옵션으로 강제 CPU 추론.
 ---
 
 ## 5. 핵심 모듈
-| 모듈            | 파일/폴더                       | 주요 기능          |
-| --------------- | ------------------------------ | ----------------  |
-| FrameCapture    | src/python/pipeline/capture.py | V4L2 캡처 스레드   |
-| DeblurLite      | src/python/ai/deblurgan.py     | DeblurGAN-v2 Lite |
-| SRLite          | src/python/ai/srgan.py         | ESRGAN-tiny       |
-| EdgeTPUDetector | src/python/ai/detector.py      | MobileNet-SSD v2  |
-| Tracker         | src/cpp/tracker/               | KCF / SORT 추적    |
-| Annotator       | src/cpp/annot/                 | 박스·궤적 그리기    |
-| VideoWriter     | src/python/pipeline/output.py  | MJPEG / H.264 저장 |
+| 모듈             | 파일/폴더                        | 주요 기능                       |
+| ---------------- | -------------------------------- | ------------------------------  |
+| FrameCapture     | src/capture/camera_capture.py    | Thread‑1: V4L2 / OpenCV 프레임 캡처       |
+| DeblurLite       | src/processing/deblurring.py       | DeblurGAN‑v2 Lite 추론 래퍼               |
+| SRLite           | src/processing/super_resolution.py           | ESRGAN‑tiny 추론 래퍼                     |
+| EdgeTPUDetector  | src/detection/tpu_detection.py        | Edge‑TPU MobileNet‑SSD 추론 래퍼                |
+| Tracker          | src/tracking/sort_tracker.py                 | IoU + 칼만필터(SORT) 구현                  |
+| Tracker          | src/tracking/multi_tracker.py                 | KCF/CSRT MultiTracker 래퍼                  |
+| Pipeline         | src/pipeline/pipeline.py                   | Thread‑2: 전체 파이프라인 조립         |
+| VideoWriter      | src/python/pipeline/output.py    | MJPEG / H.264 저장               |
 
 Pipeline	src/python/main.py	스레드 생성·전체 파이프라인 제어
 Capture	src/python/pipeline/capture.py	V4L2 / CSI 프레임 캡처 (Thread 1)
