@@ -41,44 +41,29 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 ## 3. 디렉터리 구조
 ``` text
 .
-├── README.md
-├── .gitignore
-├── requirements.txt                     # Python 의존성
-├── setup_env.sh                         # 패키지 설치 스크립트 (pip + apt)
-├── assets/
-│   └── Image1.png                       # 데모 영상·이미지
+├── assets/                 # 데모 영상 등 추가 자료
+├── build/                  # 빌드된 C++ 모듈 바이너리
 ├── docker/
-│   └── Dockerfile                       # 로컬 개발/테스트용 컨테이너
-├── cmake/                               # C++ 빌드 헬퍼
-│   └── arm-linux-gnueabihf.cmake        # Zynq cross‑toolchain 설정
-├── CMakeLists.txt                       # C++ 빌드를 최상위에서 관리
+│   └── Dockerfile              # 도커 환경 구축
+├── cmake/                  # 크로스 컴파일 설정 (.cmake)
+├── config/                 # YAML 설정
+├── models/                 # .tflite 모델
+├── scripts/                # 실행/테스트 스크립트
 ├── src/
-│   ├── capture/
-│   │   └── camera_capture.py            # Thread‑1: V4L2 / OpenCV 프레임 캡처
-│   ├── python/
-│   │   └── main.py                      # 데모 실행
-│   ├── cpp/
-│   │   └── CMakeLists.txt              # (예시)
-│   ├── processing/
-│   │   ├── deblurring.py               # DeblurGAN‑v2 Lite 추론 래퍼
-│   │   └── super_resolution.py         # ESRGAN‑tiny 추론 래퍼
-│   ├── detection/
-│   │   └── tpu_detection.py            # Edge‑TPU MobileNet‑SSD 추론 래퍼
-│   ├── tracking/
-│   │   ├── sort_tracker.py             # IoU + 칼만필터(SORT) 구현
-│   │   └── multi_tracker.py            # KCF/CSRT MultiTracker 래퍼
-│   ├── pipeline/
-│   │   ├── ouptut.py                   # Thread‑3: 디스플레이 & VideoWriter
-│   │   └── pipeline.py                 # Thread‑2: 전체 파이프라인 조립
-│   └── utils/
-│       ├── config.py                   # YAML/JSON 설정 로더
-│       └── logger.py                   # 공통 로깅 유틸
-├── scripts/
-│   ├── run_pipeline.py                 # 파이프라인 실행 엔트리
-│   └── benchmark.py                    # FPS/Latency 벤치마크
-├── config/
-│   └── pipeline.yaml                   # 파이프라인 configurations
-└── build/                              # (CMake 아웃풋)
+│   ├── cpp/                    # 고속 처리용 C++ 코드
+│   └── python/                 # 전체 파이프라인(Python)
+│       ├── main.py                 # 데모 실행
+│       ├── capture/                # Thread‑1: V4L2 / OpenCV 프레임 캡처
+│       ├── processing/             # 디블러링, 초해상도 등 전처리
+│       ├── detection/              # 객체 팀지 알고리즘
+│       ├── tracking/               # 객체 추적 트래커
+│       ├── pipeline/               # Thread‑2: 전체 파이프라인 조립, Thread‑3: 디스플레이 & VideoWriter
+│       └── utils/                  # YAML/JSON 설정 로더, 공통 로깅 유틸
+├── .gitignore              # Git 제외 설정
+├── CMakeLists.txt          # C++ 빌드 설정 파일
+├── requirements.txt        # Python 패키지 목록
+├── setup_env.sh            # 환경 구축 스크립트
+└── README.md               # 프로젝트 설명 문서
 ```
 
 ---
