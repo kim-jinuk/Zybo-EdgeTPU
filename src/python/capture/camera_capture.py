@@ -33,3 +33,14 @@ class CameraCapture(threading.Thread):
     def stop(self):
         if self.cap.isOpened():
             self.cap.release()
+
+
+if __name__ == "__main__":
+    cap_q = queue.Queue(maxsize=4)
+    out_q = queue.Queue(maxsize=4)
+
+    cam_id = int(0)
+    log = get_logger("Main")
+    log.info(f"Opening camera {0}")
+    cam_th = CameraCapture(cam_id, cap_q, {'width': 640, 'height' : 480, 'fps' : 30})
+    
