@@ -36,11 +36,38 @@ class CameraCapture(threading.Thread):
 
 
 if __name__ == "__main__":
-    cap_q = queue.Queue(maxsize=4)
-    out_q = queue.Queue(maxsize=4)
+    """
+    `$ python camera_capture.py --cam 0 --width 640 --height 480 --fps 30`
+    로 실행하면 실시간 미预 뷰 창이 뜹니다.  
+    * q / ESC : 종료
+    """
+    import argparse, sys
 
-    cam_id = int(0)
-    log = get_logger("Main")
-    log.info(f"Opening camera {0}")
-    cam_th = CameraCapture(cam_id, cap_q, {'width': 640, 'height' : 480, 'fps' : 30})
-    
+    parser = argparse.ArgumentParser(description="Quick camera-capture self-test")
+    parser.add_argument("--cam",    type=int, default=0,   help="Camera index")
+    parser.add_argument("--width",  type=int, default=640)
+    parser.add_argument("--height", type=int, default=480)
+    parser.add_argument("--fps",    type=int, default=30)
+    args = parser.parse_args()
+
+    frame_q = queue.Queue(maxsize=8)
+    cam_thr  = CameraCapture(
+        cam_id=args.cam,
+        out_q=frame_q,
+        cfg={"width": args.width, "height": args.height, "fps": args.fps},
+    )
+    cam_thr.start()
+
+    try:
+        while True:
+            ts, frame = frame_q.get()
+            cv2.imshow("CameraCapture-TEST", frame)
+            key = cv2.waitKey(1) & 0xFF
+            if key in (27, ord("q")):   # ESC or q
+                break
+    except KeyboardInterrupt:
+        pass
+    finally:
+        cam_thr.stop()
+        cv2.destroyAllWindows()
+        sys.exit(0)

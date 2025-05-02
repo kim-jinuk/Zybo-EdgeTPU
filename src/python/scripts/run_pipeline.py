@@ -1,6 +1,7 @@
 """Entry point – wires threads and launches GUI."""
 # python scripts/run_pipeline.py --cfg config/pipeline.yaml --source 0
-import argparse, queue, yaml, signal, sys, os
+import argparse, queue, yaml, signal, sys, os, threading
+sys.path.append(os.pardir)
 from pathlib import Path
 from capture.camera_capture import CameraCapture
 from pipeline.pipeline import Pipeline
