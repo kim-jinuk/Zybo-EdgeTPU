@@ -83,14 +83,22 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4-3. C++ 모듈 빌드
+### 4-3. tflite-runtime 설치
+```bash
+echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install python3-tflite-runtime
+```
+
+### 4-4. C++ 모듈 빌드
 ```bash
 mkdir build && cd build
 cmake -GNinja ..
 ninja && sudo ninja install      # libvision_core.so
 ```
 
-### 4-4. 데모 실행
+### 4-5. 데모 실행
 ```bash
 python src/python/main.py --cfg config/pipeline.yaml --source 0
 ```
