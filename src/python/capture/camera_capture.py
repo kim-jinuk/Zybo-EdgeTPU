@@ -6,6 +6,7 @@ from utils.logger import get_logger
 
 SUPPORT_FOURCC = ("MJPG", "YUYV", "H264")      # 순차 시도
 
+# 카메라가 실제로 디코딩해 주는 코덱을 3-프레임 테스트로 탐색
 def _find_working_fourcc(cap):
     for cc in SUPPORT_FOURCC:
         if cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*cc)):
@@ -25,7 +26,7 @@ class CameraCapture(threading.Thread):
         if not self.cap.isOpened():
             raise RuntimeError(f"Camera {cam_id} open failed")
 
-        # ── 1) 지원 해상도로 조정 ──────────────────────────
+        # ── 1) 카메라 파라미터 세팅 (width, height, fps, buffersize=1) ──────────────────────────
         w, h = cfg.get("width", 640), cfg.get("height", 480)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH,  w)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h)
@@ -38,7 +39,7 @@ class CameraCapture(threading.Thread):
             raise RuntimeError("No working FourCC (MJPG/YUYV/H264) found")
         self.log.info("Using FourCC %s", fourcc)
 
-        # 워밍업
+        # 워밍업용 dummy capture
         for _ in range(4):
             self.cap.read()
 
@@ -62,7 +63,7 @@ class CameraCapture(threading.Thread):
     def stop(self):
         self.cap.release()
 
-
+# 카메라 캡쳐 테스트 용 메인 함수
 if __name__ == "__main__":
     """
     `$ python camera_capture.py --cam 0 --width 640 --height 480 --fps 30`
