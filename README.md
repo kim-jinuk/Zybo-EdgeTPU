@@ -29,7 +29,7 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 | Camera         | USB UVC Logitech C920 PRO (1080p @ 30 fps) |
 | NPU            | **Google Coral USB Edge TPU**      |
 | OS             | Ubuntu 20.04 ARM / PetaLinux 2022.1 |
-| Python         | ≥ 3.9 (venv/conda 권장)            |
+| Python         | 3.9.21 (venv/conda 권장)            |
 | C++            | ≥ 17,  GCC 11 +                    |
 | OpenCV         | ≥ 4.8 (with `contrib`, BUILD_TFLITE ON) |
 | TFLite Runtime | 2.15 (armhf/arm64)                |
@@ -79,7 +79,8 @@ git submodule update --init
 
 ### 4-2. Python 환경
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
+conda create -n coral python=3.9
+conda activate coral
 pip install -r requirements.txt
 ```
 
