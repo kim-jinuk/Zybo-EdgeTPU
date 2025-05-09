@@ -81,7 +81,7 @@ git submodule update --init
 ```bash
 conda create -n coral python=3.9
 conda activate coral
-sudo apt-get install python3-pycoral
+python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
 pip install -r requirements.txt
 ```
 
