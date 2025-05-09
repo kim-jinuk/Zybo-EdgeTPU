@@ -85,7 +85,7 @@ if __name__ == "__main__":
         out_q=frame_q,
         cfg={"width": args.width, "height": args.height, "fps": args.fps},
     )
-    print('here')
+
     cam_thr.start()
     
     try:
