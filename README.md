@@ -81,9 +81,10 @@ git submodule update --init
 ```bash
 conda create -n coral python=3.9
 conda activate coral
-python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
 pip install -r requirements.txt
+python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
 sudo apt-get install libedgetpu1-std
+sudo apt-get update
 ```
 
 ### 4-3. tflite-runtime 설치
