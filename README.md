@@ -81,6 +81,7 @@ git submodule update --init
 ```bash
 conda create -n coral python=3.9
 conda activate coral
+sudo apt-get install python3-pycoral
 pip install -r requirements.txt
 ```
 
