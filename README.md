@@ -26,7 +26,7 @@ Zybo Z7-10 보드와 **Google Coral USB Edge TPU**를 이용해
 | 항목            | 사양 (권장)                       |
 |-----------------|-----------------------------------|
 | Board          | *Digilent Zybo Z7-10* (Zynq-7000) |
-| Camera         | USB UVC or MIPI-CSI (720p @ 30 fps) |
+| Camera         | USB UVC Logitech C920 PRO (1080p @ 30 fps) |
 | NPU            | **Google Coral USB Edge TPU**      |
 | OS             | Ubuntu 20.04 ARM / PetaLinux 2022.1 |
 | Python         | ≥ 3.9 (venv/conda 권장)            |
