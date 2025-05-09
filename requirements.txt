@@ -1,6 +1,5 @@
 opencv-python==4.10.0.84
-pycoral
-numpy
+numpy==1.26.4
 pyyaml
 tqdm
 filterpy
