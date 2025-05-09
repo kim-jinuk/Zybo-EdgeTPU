@@ -5,5 +5,5 @@ camera:
 queue: 4
 deblur_model: models/deblurgan_lite.tflite
 sr_model: models/esrgan_tiny.tflite
-det_model: models/ssd_mobilenet_v2_edgetpu.tflite
+det_model: models/tf2_ssd_mobilenet_v2_coco17_ptq_edgetpu.tflite
 det_thresh: 0.5

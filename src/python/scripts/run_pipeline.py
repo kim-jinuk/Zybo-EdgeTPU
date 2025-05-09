@@ -7,9 +7,10 @@ from capture.camera_capture import CameraCapture
 from pipeline.pipeline import Pipeline
 from pipeline.output import Output
 from utils.logger import get_logger
+from typing import Union
 
 
-def load_cfg(path: str | os.PathLike):
+def load_cfg(path: Union[str, os.PathLike]):
     if not Path(path).exists():
         raise FileNotFoundError(f"Config not found: {path}")
     with open(path, "r", encoding="utf-8") as f:
