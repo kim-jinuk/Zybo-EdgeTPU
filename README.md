@@ -77,7 +77,7 @@ cd Zybo-EdgeTPU
 git submodule update --init
 ```
 
-### 4-2. Python 환경
+### 4-2. Installation
 ```bash
 conda create -n coral python=3.9
 conda activate coral
@@ -87,23 +87,14 @@ sudo apt-get install libedgetpu1-std
 sudo apt-get update
 ```
 
-### 4-3. tflite-runtime 설치
-```bash
-echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-sudo apt-get update
-sudo apt-get install libedgetpu1-std
-sudo apt-get install python3-pycoral
-```
-
-### 4-4. C++ 모듈 빌드
+### 4-3. C++ 모듈 빌드
 ```bash
 mkdir build && cd build
 cmake -GNinja ..
 ninja && sudo ninja install      # libvision_core.so
 ```
 
-### 4-5. 데모 실행
+### 4-4. 데모 실행
 ```bash
 python src/python/main.py --cfg config/pipeline.yaml --source 0
 ```
