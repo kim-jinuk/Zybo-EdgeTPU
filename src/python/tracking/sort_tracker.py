@@ -9,6 +9,8 @@ class KalmanBoxTracker:
     count = 0
     def __init__(self, bbox):
         # x,y,s,r velocity + position (similar to original SORT)
+        if bbox[2] <= bbox[0] or bbox[3] <= bbox[1]:
+            bbox = [0, 0, 1, 1]  # 최소 크기 보정
         self.kf = KalmanFilter(dim_x=7, dim_z=4)
         # State: [cx, cy, s, r, vx, vy, vs]
         self.kf.F = np.eye(7)
@@ -32,6 +34,8 @@ class KalmanBoxTracker:
         self.age = 0
 
     def update(self, bbox):
+        if bbox[2] <= bbox[0] or bbox[3] <= bbox[1]:
+            bbox = [0, 0, 1, 1]  # 최소 크기 보정
         self.time_since_update = 0
         self.hits += 1
         self.hit_streak += 1
@@ -50,10 +54,13 @@ class KalmanBoxTracker:
         return self.get_state()
 
     def get_state(self):
-        cx,cy,s,r = self.kf.x[:4].reshape(-1)
-        w = np.sqrt(s*r)
-        h = s/w
-        return np.array([cx-w/2, cy-h/2, cx+w/2, cy+h/2])
+        cx, cy, s, r = self.kf.x[:4].reshape(-1)
+        if not np.isfinite(s * r) or s <= 0 or r <= 0:
+            w = h = 0.0
+        else:
+            w = np.sqrt(s * r)
+            h = s / (w + 1e-6)
+        return np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2])
 
 class Sort:
     def __init__(self, max_age:int=10, min_hits:int=3, iou_thresh:float=0.3):
@@ -97,14 +104,19 @@ class Sort:
         return np.array(ret)
 
     def _associate(self, dets, trks):
-        if len(trks)==0 or len(dets)==0:
+        if len(trks) == 0 or len(dets) == 0:
             return [], np.arange(len(dets)), np.arange(len(trks))
-        iou_mat = iou_batch(trks, dets[:,:4])  # trks x dets
+        
+        iou_mat = iou_batch(trks, dets[:, :4])
+        
+        # NaN 방지 처리
+        iou_mat = np.nan_to_num(iou_mat, nan=-1e5)
+
         matched_indices = linear_sum_assignment(-iou_mat)
         matched_indices = np.asarray(matched_indices).T
-        unmatched_dets = np.setdiff1d(np.arange(len(dets)), matched_indices[:,1])
-        unmatched_trks = np.setdiff1d(np.arange(len(trks)), matched_indices[:,0])
-        # filter out matches with low IoU
+        unmatched_dets = np.setdiff1d(np.arange(len(dets)), matched_indices[:, 1])
+        unmatched_trks = np.setdiff1d(np.arange(len(trks)), matched_indices[:, 0])
+
         matches = []
         for t_idx, d_idx in matched_indices:
             if iou_mat[t_idx, d_idx] < self.iou_thresh:
@@ -112,4 +124,7 @@ class Sort:
                 unmatched_trks = np.append(unmatched_trks, t_idx)
             else:
                 matches.append([t_idx, d_idx])
+        
         return np.asarray(matches), unmatched_dets, unmatched_trks
+
+

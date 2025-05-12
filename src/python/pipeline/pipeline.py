@@ -11,16 +11,16 @@ class Pipeline(threading.Thread):
         super().__init__(daemon=True)
         self.in_q, self.out_q = in_q, out_q
         self.log = get_logger("Pipeline")
-        self.deblur = Deblurrer(cfg["deblur_model"])
-        self.sr     = SuperResolver(cfg["sr_model"])
+        #self.deblur = Deblurrer(cfg["deblur_model"])
+        #self.sr     = SuperResolver(cfg["sr_model"])
         self.det    = TPUDetector(cfg["det_model"], cfg.get("det_thresh", 0.5))
         self.trk    = Sort()
 
     def run(self):
         while True:
             ts, frame = self.in_q.get()
-            frame = self.deblur(frame)
-            frame = self.sr(frame)
+            #frame = self.deblur(frame)
+            #frame = self.sr(frame)
             dets  = self.det(frame)
             tracks = self.trk.update(dets)
             self.out_q.put((ts, frame, tracks))
