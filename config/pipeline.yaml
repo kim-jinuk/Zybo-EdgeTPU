@@ -2,8 +2,33 @@ camera:
   width: 640
   height: 480
   fps: 30
+
+# config/pipeline.yaml
+preprocessing:
+  contrast_enhance:        # CLAHEContrast
+    enable: false           # ← false 로 끄기
+    clip_limit: 3.0
+    tile_grid: [8, 8]
+
+  edge_enhance:            # UnsharpMask
+    enable: false
+    ksize: 5
+    amount: 1.2
+
+  denoise:                 # FastDenoise
+    enable: false
+    h: 7
+
+  deblur:                  # WienerDeblur
+    enable: false
+    kernel: 9
+    K: 0.01
+
+  clutter_removal:         # ClutterRemoval
+    enable: false
+
 queue: 4
 deblur_model: models/deblurgan_lite.tflite
 sr_model: models/esrgan_tiny.tflite
 det_model: ../../models/tf2_ssd_mobilenet_v2_coco17_ptq_edgetpu.tflite
-det_thresh: 0.5
+det_thresh: 0.7
