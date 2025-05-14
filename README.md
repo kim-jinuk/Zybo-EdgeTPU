@@ -83,6 +83,10 @@ conda create -n coral python=3.9
 conda activate coral
 pip install -r requirements.txt
 python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
+echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
+echo "deb https://packages.cloud.google.com/apt coral-cloud-stable main" | sudo tee /etc/apt/sources.list.d/coral-cloud.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo apt install edgetpu-compiler
 sudo apt-get install libedgetpu1-std
 sudo apt-get update
 ```
@@ -96,7 +100,7 @@ ninja && sudo ninja install      # libvision_core.so
 
 ### 4-4. 데모 실행
 ```bash
-python src/python/main.py --cfg config/pipeline.yaml --source 0
+python src/python/main.py --cfg ../../config/pipeline.yaml --source 0
 ```
 
 기본값: 30 FPS, 640×480. \
