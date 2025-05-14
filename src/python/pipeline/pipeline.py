@@ -1,5 +1,5 @@
 # Thread‑2: End‑to‑end pipeline glue.
-import queue, threading
+import queue, threading, time
 from processing.enhancers import build_preprocessing      # ★ NEW
 from processing.deblurring import Deblurrer
 from processing.super_resolution import SuperResolver
@@ -34,12 +34,23 @@ class Pipeline(threading.Thread):
 
     def run(self):
         while True:
+            # print("Capture:", (t1-t0)*1e3, "ms")
             ts, frame = self.in_q.get()
+
+            t0 = time.perf_counter()
             frame = self.pre(frame)
+            t1 = time.perf_counter()
             #frame = self.deblur(frame)
             #frame = self.sr(frame)
             dets  = self.det(frame)
+            t2 = time.perf_counter()
             tracks = self.trk.update(dets)
+            t3 = time.perf_counter()
             self.out_q.put((ts, frame, tracks))
-
+            t4 = time.perf_counter()
+            
+            print(f"Pre-processing:{(t1-t0)*1e3:5.1f}  \n"
+                f"Detection:{(t2-t1)*1e3:5.1f}\n"
+                f"Tracking:{(t3-t2)*1e3:5.1f}\n"
+                f"Output:{(t4-t3)*1e3:5.1f}\n")
 

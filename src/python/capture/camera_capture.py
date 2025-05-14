@@ -46,7 +46,10 @@ class CameraCapture(threading.Thread):
     def run(self):
         drop = 0
         while True:
+            t0 = time.perf_counter()
             ret, frame = self.cap.read()
+            print(f"Capture:{(time.perf_counter()-t0)*1e3:5.1f}")
+
             if not ret:
                 self.log.warning("grab failed")
                 time.sleep(0.05)
