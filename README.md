@@ -84,6 +84,7 @@ conda activate coral
 pip install -r requirements.txt
 python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
 echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
+echo "deb https://packages.cloud.google.com/apt coral-cloud-stable main" | sudo tee /etc/apt/sources.list.d/coral-cloud.list
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo apt install edgetpu-compiler
 sudo apt-get install libedgetpu1-std
