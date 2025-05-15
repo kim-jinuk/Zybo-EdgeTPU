@@ -83,6 +83,8 @@ git submodule update --init
 ```bash
 conda create -n coral python=3.9
 conda activate coral
+python -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
+pip install -r requirements.txt
 ```
 
 #### 4-2-2. 필수 패키지 설치
