@@ -78,7 +78,7 @@ git submodule update --init
 ```
 
 ### 4-2. Installation
-#### 4-2-1. 파이썬 가상환경 환경 설치
+#### 4-2-1. 파이썬 가상환경 설치
 ```bash
 conda create -n coral python=3.9
 conda activate coral
@@ -86,7 +86,7 @@ pip install -r requirements.txt
 python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
 ```
 
-#### 4-2-2. 환경 설정
+#### 4-2-1. 필수 패키지 설치
 ```bash
 echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
