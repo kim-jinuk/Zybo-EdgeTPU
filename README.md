@@ -89,11 +89,10 @@ python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/
 #### 4-2-2. 환경 설정
 ```bash
 echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
-echo "deb https://packages.cloud.google.com/apt coral-cloud-stable main" | sudo tee /etc/apt/sources.list.d/coral-cloud.list
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-sudo apt install edgetpu-compiler
-sudo apt-get install libedgetpu1-std
 sudo apt-get update
+sudo apt-get install libedgetpu1-std
+sudo apt-get install python3-pycoral
 ```
 
 ### 4-3. C++ 모듈 빌드
