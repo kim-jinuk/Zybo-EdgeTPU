@@ -2,7 +2,7 @@
 
 Usage (from project root)::
 
-    python -m python.main --cfg config/pipeline.yaml --source 0
+    python main.py --cfg ../../config/pipeline.yaml --source 0
 
 It simply forwards all CLI arguments to ``scripts/run_pipeline.py`` so
 there is a single place that implements the full threaded pipeline.
