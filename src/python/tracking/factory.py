@@ -19,45 +19,72 @@
 #   2) _REGISTRY["foo"] = (import_path, class_name)
 # -------------------------------------------------------------------------------------------
 from __future__ import annotations
-import importlib
-from typing import Dict, Tuple, Callable, Any
+import importlib, sys, difflib
+from typing import Dict, Tuple, Any
+from functools import lru_cache
 
-# (1) registry:  alias → (module_path, class_name)
+# ---------------------------------------------------------------------
+# 1. Alias → (module_path, class_name)
+# ---------------------------------------------------------------------
 _REGISTRY: Dict[str, Tuple[str, str]] = {
-    "sort":      ("tracking.sort_tracker",      "Sort"),
-    "deepsort":  ("tracking.deepsort_tracker",  "DeepSort"),
-    "bytetrack": ("tracking.bytetrack_tracker", "ByteTracker"),
-    "ocsort":    ("tracking.ocsort_tracker",    "OCSort"),
+    # Deep trackers ----------------------------------------------------
+    "sort":      ("tracking.deep_trackers", "Sort"),
+    "deepsort":  ("tracking.deep_trackers", "DeepSort"),
+    "bytetrack": ("tracking.deep_trackers", "ByteTracker"),
+    "ocsort":    ("tracking.deep_trackers", "OCSort"),
+
+    # OpenCV trackers --------------------------------------------------
+    "kcf":        ("tracking.opencv_trackers", "KCFTracker"),
+    "csrt":       ("tracking.opencv_trackers", "CSRTTracker"),
+    "mosse":      ("tracking.opencv_trackers", "MOSSETracker"),
+    "mil":        ("tracking.opencv_trackers", "MILTracker"),
+    "medianflow": ("tracking.opencv_trackers", "MedianFlowTracker"),
 }
 
-
-def _dynamic_import(module_path: str, class_name: str):
-    """늦은 import로 불필요한 의존 로딩 최소화."""
+# ---------------------------------------------------------------------
+# 2. Import helper with LRU‑cache
+# ---------------------------------------------------------------------
+@lru_cache(maxsize=None)
+def _import_class(module_path: str, class_name: str):
     module = importlib.import_module(module_path)
     return getattr(module, class_name)
 
+# ---------------------------------------------------------------------
+# 3. Public factory API
+# ---------------------------------------------------------------------
 
 def build_tracker(cfg: Dict[str, Any]):
-    """Factory 함수
+    t_cfg   = cfg.get("tracker", {})
+    alias   = str(t_cfg.get("name", "sort")).lower()
+    params  = t_cfg.get("params", {})
 
-    Args:
-        cfg (dict): 전체 pipeline.yaml 파싱 결과.
+    if alias not in _REGISTRY:
+        hint = difflib.get_close_matches(alias, _REGISTRY.keys(), n=1)
+        raise ValueError(f"[TrackerFactory] Unknown tracker '{alias}'. Did you mean {hint}?" if hint else
+                         f"[TrackerFactory] Unknown tracker '{alias}'.")
 
-    Returns:
-        tracker instance (duck‑typed): .update(ndarray Nx5) → ndarray Mx5  (x1,y1,x2,y2,id)
-    """
-    t_cfg = cfg.get("tracker", {})
-    name  = str(t_cfg.get("name", "sort")).lower()
-    params = t_cfg.get("params", {})
-
-    if name not in _REGISTRY:
-        raise ValueError(f"[TrackerFactory] 지원하지 않는 tracker '{name}'. Registry = {list(_REGISTRY)}")
-
-    module_path, class_name = _REGISTRY[name]
+    module_path, class_name = _REGISTRY[alias]
     try:
-        TrackerCls = _dynamic_import(module_path, class_name)
+        TrackerCls = _import_class(module_path, class_name)
     except ModuleNotFoundError as e:
-        raise ImxcdwsewwrvportError(f"[TrackerFactory] '{name}' import 실패: {e}. 모듈 설치 여부 확인!")
+        raise ImportError(
+            f"[TrackerFactory] '{alias}' import 실패 → {e}\n"
+            "필요한 pip 패키지를 설치했는지 확인하세요.") from e
 
-    # 트래커마다 __init__ 시그니처가 다르므로 **params 전달
     return TrackerCls(**params)
+
+# ---------------------------------------------------------------------
+# 4. CLI helper
+# ---------------------------------------------------------------------
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "list":
+        print("\n[TrackerFactory] Registry & import status:\n")
+        for k,(m,c) in _REGISTRY.items():
+            try:
+                _import_class(m,c)
+                status = "✓"
+            except Exception as e:
+                status = f"✗  ({type(e).__name__})"
+            print(f"  {k:<11} → {m}.{c:<18} {status}")
+    else:
+        print("usage: python -m tracking.factory list")
