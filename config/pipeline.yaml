@@ -7,7 +7,7 @@ queue: 4
 
 ############# 영상 개선 기능 #############
 preprocessing:
-  preset: Night
+  preset: Normal      # Night | Fog | Motion | IR ... 
 
 # 수동 커스텀도 그대로 지원
 # preprocessing:
@@ -16,6 +16,13 @@ preprocessing:
 #   edge_enhance:
 #     ksize: 5
 #     amount: 1.0
+
+############# 모델 추적 #############
+tracker:
+  name: sort          # sort | deepsort | bytetrack | ocsort ...
+  params:                  # (옵션) 각 트래커별 키워드 인자 → dict
+    track_thresh: 0.5
+    match_thresh: 0.8
 
 ############# 모델 추론 #############
 det_model: ../../models/tf2_ssd_mobilenet_v2_coco17_ptq_edgetpu.tflite
