@@ -5,6 +5,7 @@ from detection.tpu_detection import TPUDetector
 from tracking.sort_tracker import Sort
 from utils.logger import get_logger
 from typing import Optional
+from tracking.factory import build_tracker
 
 # ------------------------------------------------------------
 def _make_preprocessor(pcfg: Optional[dict]):
@@ -43,7 +44,8 @@ class Pipeline(threading.Thread):
 
         self.pre = _make_preprocessor(cfg.get("preprocessing"))
         self.det = TPUDetector(cfg["det_model"], cfg.get("det_thresh", 0.5))
-        self.trk = Sort()
+        # self.trk = Sort()
+        self.trk = build_tracker(cfg)
 
     def run(self):
         while True:
