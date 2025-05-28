@@ -9,6 +9,7 @@ from .base import Detector
 
 class TPUDetector(Detector):
     def __init__(self, model_path, threshold=0.4):
+        # tflite 모델 로딩
         self.interpreter = make_interpreter(model_path)
         self.interpreter.allocate_tensors()
         self.threshold = threshold
@@ -17,7 +18,9 @@ class TPUDetector(Detector):
     def detect(self, frame):
         h, w = frame.shape[:2]
         resized = cv2.resize(frame, self.size)
+        # numpy 배열 → Edge TPU 인터프리터에 넣음
         set_input(self.interpreter, resized)
+        # 실제 추론 수행 (Edge TPU에서 실행됨)
         self.interpreter.invoke()
         objs = get_objects(self.interpreter, self.threshold)
 

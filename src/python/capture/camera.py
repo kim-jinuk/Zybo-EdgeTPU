@@ -13,6 +13,7 @@ class CameraCapture(CaptureThread):
         self.cap = cv2.VideoCapture(cam_id)
         self._configure_camera()
 
+    # 해상도, FPS 설정 수행
     def _configure_camera(self):
         width = self.cfg.get("camera", {}).get("width", 640)
         height = self.cfg.get("camera", {}).get("height", 480)

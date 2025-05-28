@@ -35,15 +35,19 @@ class OutputThread(threading.Thread):
                 continue
 
             fps = self._update_fps(ts)
+
+            # 유사 IR 열영상 변환 처리 옵션
             if self.display_gray:
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 frame = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
 
+            # 객체 박스와 ID 출력
             for track in tracks:
                 x1, y1, x2, y2, track_id = map(int, track[:5])
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(frame, f"ID:{track_id}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-
+            
+            # FPS 표시
             cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
             cv2.imshow("Output", frame)
 
