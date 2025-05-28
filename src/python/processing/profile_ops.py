@@ -2,16 +2,25 @@
 import time, collections, argparse, cv2, numpy as np
 from pathlib import Path
 from enhancers import (
+    LightCLAHE, CLAHEContrast, 
     GammaContrast, UnsharpMask, GaussianDenoise,
     LaplacianDeblur, ClutterRemoval
 )
-
+'''
+original
 OPS = [
     ("CONTRAST",  GammaContrast(gamma=0.75)),
     ("SHARPEN",   UnsharpMask(5, 1.2)),
     ("DENOISE",   GaussianDenoise(ksize=3)),
     ("DEBLUR",    LaplacianDeblur(alpha=1.2, ks=3)),
     ("CLUTTER",   ClutterRemoval()),
+]
+'''
+
+OPS = [
+    ("CONTRAST",  GammaContrast(gamma=0.75)),
+    ("SHARPEN",   LightCLAHE()),
+    ("DENOISE",   CLAHEContrast()),
 ]
 
 def grab_source(src, w, h, fourcc):

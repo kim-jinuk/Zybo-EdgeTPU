@@ -44,8 +44,8 @@ class Pipeline(threading.Thread):
 
         self.pre = _make_preprocessor(cfg.get("preprocessing"))
         self.det = TPUDetector(cfg["det_model"], cfg.get("det_thresh", 0.5))
-        # self.trk = Sort()
-        self.trk = build_tracker(cfg)
+        self.trk = Sort()
+        #self.trk = build_tracker(cfg)
 
     def run(self):
         while True:

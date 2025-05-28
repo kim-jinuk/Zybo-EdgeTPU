@@ -8,6 +8,7 @@ python demo_all.py --video ./clip.mp4       # 파일도 OK
 from pathlib import Path
 import argparse, sys, cv2, numpy as np
 from enhancers import (
+    BilateralDenoise,
     GammaContrast, UnsharpMask, GaussianDenoise,
     LaplacianDeblur, ClutterRemoval
 )
@@ -17,7 +18,7 @@ OPS = [
     ("ORIG",   lambda x: x),
     ("CONTR",  GammaContrast(gamma=0.75)),
     ("SHARP",  UnsharpMask(ksize=5, amount=1.2)),
-    ("DENOISE",GaussianDenoise(ksize=3)),
+    ("DENOISE", GaussianDenoise(ksize=3)),
     ("DEBLUR", LaplacianDeblur(alpha=1.2, ks=3)),
     ("CLUTTER",ClutterRemoval(history=50, var_threshold=25)),
 ]

@@ -44,13 +44,14 @@ def _iou(b1: np.ndarray, b2: np.ndarray) -> float:
 # ------------------------------------------------------------
 # 2. Single object wrapper
 # ------------------------------------------------------------
+TrackerModule = cv2.legacy if hasattr(cv2, 'legacy') else cv2
 
 _CTOR_MAP = {
-    "kcf":        cv2.TrackerKCF_create,
-    "csrt":       cv2.TrackerCSRT_create,
-    "mosse":      cv2.TrackerMOSSE_create,
-    "mil":        cv2.TrackerMIL_create,
-    "medianflow": cv2.TrackerMedianFlow_create,
+    "kcf":        TrackerModule.TrackerKCF_create,
+    "csrt":       TrackerModule.TrackerCSRT_create,
+    "mosse":      TrackerModule.TrackerMOSSE_create,
+    "mil":        TrackerModule.TrackerMIL_create,
+    "medianflow": TrackerModule.TrackerMedianFlow_create,
 }
 
 class _Track:

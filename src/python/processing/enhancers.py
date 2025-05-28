@@ -106,6 +106,31 @@ class CLAHEContrast(Preprocessor):
         l = self.clahe.apply(l)
         return cv2.cvtColor(cv2.merge((l, a, b)), cv2.COLOR_LAB2BGR)
 
+@register
+class EdgeEnhance(Preprocessor):
+    """
+    Sobel-based edge enhancement (≈ 0.5 ms @ 640×480)
+
+    α : 윤곽선 강조 정도 (권장 범위 0.5 ~ 2.0)
+    """
+    def __init__(self, alpha: float = 1.0):
+        self.alpha = alpha
+
+    def __call__(self, frame: np.ndarray) -> np.ndarray:
+        # 1) 그레이 변환
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # 2) Sobel 엣지 추출
+        grad_x = cv2.Sobel(gray, cv2.CV_16S, 1, 0, ksize=3)
+        grad_y = cv2.Sobel(gray, cv2.CV_16S, 0, 1, ksize=3)
+        grad = cv2.addWeighted(cv2.convertScaleAbs(grad_x), 0.5,
+                               cv2.convertScaleAbs(grad_y), 0.5, 0)
+
+        # 3) 원본에 가중합으로 윤곽 강조
+        grad_bgr = cv2.cvtColor(grad, cv2.COLOR_GRAY2BGR)
+        enhanced = cv2.addWeighted(frame, 1.0, grad_bgr, self.alpha, 0)
+
+        return enhanced
 
 @register
 class UnsharpMask(Preprocessor):
