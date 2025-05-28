@@ -1,39 +1,32 @@
+source: 0  # Camera ID (0) or video path string
+
 ############# 카메라 캡쳐 #############
 camera:
   width: 640
   height: 480
   fps: 30
-queue: 4
 
 ############# 영상 개선 기능 #############
 preprocessing:
-  preset: Normal      # Night | Fog | Motion | IR ... 
-
-# 수동 커스텀도 그대로 지원
-# preprocessing:
-#   contrast_enhance:
-#     gamma: 0.75
-#   edge_enhance:
-#     ksize: 5
-#     amount: 1.0
-
-############# 모델 추적 #############
-#tracker:
-#  name: sort          # sort | deepsort | bytetrack | ocsort ...
-#  params:                  # (옵션) 각 트래커별 키워드 인자 → dict
-#    track_thresh: 0.5
-#    match_thresh: 0.8
-    
-# OpenCV 엔진 예시
-tracker:
-  name: csrt
-  params:
-    max_age: 15          # miss 허용 프레임
-    min_iou: 0.25
+  gamma:
+    enable: true
+    value: 1.5
+  unsharp:
+    enable: true
+    value: 1.0
 
 ############# 모델 추론 #############
-det_model: ../../models/tf2_ssd_mobilenet_v2_coco17_ptq_edgetpu.tflite
-det_thresh: 0.7
+detector:
+  model: models/tf2_ssd_mobilenet_v2_coco17_ptq_edgetpu.tflite
+  threshold: 0.7
+
+############# 모델 추적 #############
+tracker:
+  name: sort
+  params:
+    max_age: 30
+    min_hits: 3
+    iou_threshold: 0.3
 
 ############# 영상 출력 #############
-display_gray: true
+display_gray: false

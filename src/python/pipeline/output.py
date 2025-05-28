@@ -1,74 +1,52 @@
-# src/python/output.py  –  Thread‑3 : Display & Save (FPS HUD always, optional pseudo-IR display)
-# ================================================================
-import cv2, queue, threading, math, numpy as np, yaml, time
+# pipeline/output.py
+import threading
+import queue
+import cv2
+import time
+import numpy as np
 from utils.logger import get_logger
 
-class Output(threading.Thread):
-    """Displays frames and draws tracking boxes with an always-on FPS HUD.
-    Optionally display pseudo-IR (thermal) if `display_gray` is True in config.
-    Expects queue entries: (timestamp, frame, tracks).
-    * timestamp: float – capture time.
-    * frame: H×W×3 BGR image.
-    * tracks: list[(x1,y1,x2,y2,id)].
-    ESC closes the window."""
-    def __init__(self, in_q: queue.Queue, config_path: str = "../../config/pipeline.yaml"):
+class OutputThread(threading.Thread):
+    def __init__(self, in_q: queue.Queue, config: dict):
         super().__init__(daemon=True)
         self.q = in_q
+        self.cfg = config
+        self.display_gray = config.get("display_gray", False)
         self.log = get_logger("Output")
         self.last_ts = None
         self.fps_ema = 0.0
-        try:
-            with open(config_path, 'r') as f:
-                cfg = yaml.safe_load(f) or {}
-            self.display_gray = cfg.get('display_gray', False)
-        except Exception as e:
-            self.log.warning(f"Failed to load config '{config_path}': {e}")
-            self.display_gray = False
 
-    def _update_fps(self, curr_ts: float) -> float:
+    def _update_fps(self, curr_ts):
         if self.last_ts is None:
             self.last_ts = curr_ts
             return 0.0
-        dt = curr_ts - self.last_ts
+        delta = curr_ts - self.last_ts
         self.last_ts = curr_ts
-        if dt <= 0:
-            return self.fps_ema
-        inst_fps = 1.0 / dt
-        self.fps_ema = 0.9 * self.fps_ema + 0.1 * inst_fps if self.fps_ema else inst_fps
+        fps = 1.0 / delta if delta > 0 else 0.0
+        alpha = 0.1
+        self.fps_ema = (1 - alpha) * self.fps_ema + alpha * fps
         return self.fps_ema
 
     def run(self):
         while True:
-            cap_ts, frame, tracks = self.q.get()
+            try:
+                ts, frame, tracks = self.q.get(timeout=1)
+            except queue.Empty:
+                continue
 
-            # Optional pseudo-IR display
+            fps = self._update_fps(ts)
             if self.display_gray:
-                # 1) BGR → Gray
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                # 2) CLAHE 적용 (contrast enhancement)
-                clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-                gray_eq = clahe.apply(gray)
-                # 3) Gray → BGR (다른 코드와 통일시키기 위함)
-                frame = cv2.cvtColor(gray_eq, cv2.COLOR_GRAY2BGR)
+                frame = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
 
-            # Draw tracking boxes
-            h, w = frame.shape[:2]
-            for x1, y1, x2, y2, tid in tracks:
-                if not all(map(math.isfinite, (x1, y1, x2, y2))):
-                    continue
-                xi1 = int(np.clip(x1, 0, w - 1)); yi1 = int(np.clip(y1, 0, h - 1))
-                xi2 = int(np.clip(x2, 0, w - 1)); yi2 = int(np.clip(y2, 0, h - 1))
-                if xi2 > xi1 and yi2 > yi1:
-                    cv2.rectangle(frame, (xi1, yi1), (xi2, yi2), (0, 255, 0), 2)
-                    cv2.putText(frame, f"ID:{int(tid)}", (xi1, yi1 - 8),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
+            for track in tracks:
+                x1, y1, x2, y2, track_id = map(int, track[:5])
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(frame, f"ID:{track_id}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
-            # FPS HUD
-            fps = self._update_fps(cap_ts)
-            cv2.putText(frame, f"FPS: {fps:5.1f}", (10, 20),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+            cv2.imshow("Output", frame)
 
-            cv2.imshow("EO", frame)
             if cv2.waitKey(1) & 0xFF == 27:
                 break
 

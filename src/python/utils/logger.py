@@ -1,9 +1,12 @@
-"""Minimal colored console logger."""
-import logging, sys
-_FMT = "%(asctime)s | %(name)s | %(levelname)-8s | %(message)s"
-_handler = logging.StreamHandler(sys.stdout)
-_handler.setFormatter(logging.Formatter(_FMT))
-logging.basicConfig(level=logging.INFO, handlers=[_handler])
+# utils/logger.py
+import logging
 
-def get_logger(name:str):
-    return logging.getLogger(name)
+def get_logger(name: str):
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('[%(asctime)s][%(levelname)s][%(name)s] %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.DEBUG)
+    return logger
