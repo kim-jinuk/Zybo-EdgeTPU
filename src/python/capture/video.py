@@ -1,6 +1,6 @@
 # capture/video.py
 import cv2
-import time
+import time, queue
 from .base import CaptureThread
 from utils.logger import get_logger
 

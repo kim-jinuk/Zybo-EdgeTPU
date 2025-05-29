@@ -8,12 +8,21 @@ camera:
 
 ############# 영상 개선 기능 #############
 preprocessing:
-  gamma:
+  Contrast:
     enable: true
-    value: 1.5
-  unsharp:
+    value1: 1.5
+    value2: 4
+  EdgeEnhance:
     enable: true
     value: 1.0
+  Denoise:
+    enable: false
+    value1: 1.0
+    value2: 0
+  Deblur:
+    enable: false
+  Clutter:
+    enable: false
 
 ############# 모델 추론 #############
 detector:
