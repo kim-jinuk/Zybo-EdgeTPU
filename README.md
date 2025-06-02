@@ -105,9 +105,16 @@ pip install -r requirements.txt
 
 ### 4-3. C++ 모듈 빌드
 ```bash
+wget https://packages.cloud.google.com/apt/pool/coral-edge/edgetpu/libedgetpu-dev/libedgetpu-dev_2.0-20240315.0_arm64.deb  # 예시
+wget https://packages.cloud.google.com/apt/pool/coral-edge/edgetpu/libedgetpu1-std/libedgetpu1-std_2.0-20240315.0_arm64.deb
+dpkg-deb -x libedgetpu1-std_*.deb  tmp/
+dpkg-deb -x libedgetpu-dev_*.deb   tmp/
+mkdir -p third_party/edgetpu/lib   third_party/edgetpu/include
+cp -a tmp/usr/lib/*/*libedgetpu.so* third_party/edgetpu/lib/
+cp -a tmp/usr/include/edgetpu.h     third_party/edgetpu/include/
 mkdir build && cd build
-cmake -GNinja ..
-ninja && sudo ninja install      # libvision_core.so
+cmake -DEDGETPU_ROOT=${PWD}/third_party/edgetpu ..
+make -j$(nproc)
 ```
 
 ### 4-4. 데모 실행
