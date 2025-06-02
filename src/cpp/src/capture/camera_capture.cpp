@@ -20,13 +20,18 @@ CameraCapture::CameraCapture(int cam_id, int width, int height, int fps, Queue& 
     frame_period_ms_ = 1000.0 / fps;
 }
 
-bool CameraCapture::grab(Frame& out) {
+bool CameraCapture::grab(Frame& out)
+{
     cv::Mat frame;
     if (!cap_.read(frame)) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(frame_period_ms_)));
+        std::cerr << "[Capture] read FAILED\n";
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(static_cast<int>(frame_period_ms_)));
         return false;
     }
+    // 정상 프레임
+    std::cerr << "[Capture] read OK\n";
     out.timestamp = static_cast<double>(cv::getTickCount()) / cv::getTickFrequency();
-    out.img = std::move(frame);
+    out.img = frame.clone();          // ← 파이프라인에서 사용하므로 깊은 복사
     return true;
 }
