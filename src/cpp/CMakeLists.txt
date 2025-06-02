@@ -1,7 +1,8 @@
-add_library(frame_tools
-    include/frame_tools/frame_draw.hpp
-    src/frame_draw.cpp)
-find_package(OpenCV REQUIRED)
-set_target_properties(frame_tools PROPERTIES POSITION_INDEPENDENT_CODE ON)
-include_directories(include)
-target_link_libraries(frame_tools PUBLIC ${OpenCV_LIBS})
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/cpp/src/*.cpp)
+file(GLOB_RECURSE HDR_FILES CONFIGURE_DEPENDS src/cpp/include/*.hpp)
+
+add_library(zybo_edge SHARED ${SRC_FILES} ${HDR_FILES})
+
+target_include_directories(zybo_edge PUBLIC src/cpp/include)
+
+target_link_libraries(zybo_edge PUBLIC OpenCV::opencv pybind11::embed)

@@ -27,7 +27,7 @@ preprocessing:
 ############# 모델 추론 #############
 detector:
   model: models/tf2_ssd_mobilenet_v2_coco17_ptq_edgetpu.tflite
-  threshold: 0.7
+  threshold: 0.6
 
 ############# 모델 추적 #############
 tracker:
