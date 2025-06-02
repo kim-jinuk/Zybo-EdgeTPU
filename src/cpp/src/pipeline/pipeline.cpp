@@ -1,10 +1,12 @@
 // ================= pipeline/pipeline.cpp =======================================
 #include "pipeline/pipeline.hpp"
 using namespace zybo::pipeline; using namespace zybo;
+
 Pipeline::Pipeline(int cam,int w,int h,int fps,const std::string& model,float thr)
     :cam_(cam,w,h,fps,cap_q_),
      proc_({std::make_shared<processing::GammaContrast>(1.5f), std::make_shared<processing::UnsharpMask>(1.0f)}),
-     det_(model,thr), tracker_{}
+     det_(model,thr),
+     tracker_{}
 {}
 Pipeline::~Pipeline(){stop();}
 void Pipeline::start(){cam_.start(); out_.start(); running_=true; thr_=std::thread(&Pipeline::loop,this);} 

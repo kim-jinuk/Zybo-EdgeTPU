@@ -9,7 +9,7 @@ public:
     CameraCapture(int cam_id, int width, int height, int fps, Queue& out_q);
     ~CameraCapture() override = default;
 protected:
-    bool grabFrame(Frame& out) override;
+    bool grab(Frame& out) override;
 private:
     cv::VideoCapture cap_;
     double frame_period_ms_;

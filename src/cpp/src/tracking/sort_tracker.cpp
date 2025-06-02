@@ -5,14 +5,6 @@
 
 using namespace zybo::tracking;
 
-// ---- simplistic 4‑state linear Kalman stub ----
-struct SortTracker::KalmanBox {
-    cv::Rect2f bbox; int id; int age=0; int hit=0; int time_since_update=0;
-    KalmanBox(const cv::Rect2f& r,int i):bbox(r),id(i){}
-    void predict(){age++; time_since_update++; /* no motion model */}
-    void update(const cv::Rect2f& r){bbox=r; time_since_update=0; hit++;}
-};
-
 SortTracker::SortTracker(int max_age,int min_hits,float thr)
     :max_age_(max_age),min_hits_(min_hits),iou_thr_(thr){}
 

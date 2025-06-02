@@ -9,7 +9,7 @@ public:
     VideoCapture(const std::string& path, Queue& out_q);
     ~VideoCapture() override = default;
 protected:
-    bool grabFrame(Frame& out) override;
+    bool grab(Frame& out) override;
 private:
     cv::VideoCapture cap_;
     double frame_period_ms_;

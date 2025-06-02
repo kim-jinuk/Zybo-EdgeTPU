@@ -8,6 +8,7 @@ namespace zybo::detection {
 class TPUDetector : public Detector {
 public:
     TPUDetector(const std::string& model_path, float threshold = 0.4f);
+    ~TPUDetector() override;
     std::vector<Detection> detect(const cv::Mat& img) override;
 private:
     float threshold_;

@@ -2,6 +2,7 @@
 #include "detection/tpu_detector.hpp"
 #include <pybind11/embed.h>
 #include <opencv2/imgproc.hpp>
+#include <pybind11/numpy.h>
 
 namespace py = pybind11;
 using namespace zybo::detection;
@@ -18,7 +19,7 @@ struct TPUDetector::Impl {
         interpreter.attr("allocate_tensors")();
         input_size = coral_common.attr("input_size")(interpreter);
     }
-
+    
     std::vector<Detection> run(const cv::Mat& img, float thresh) {
         // Resize
         int w = input_size[0].cast<int>();
@@ -27,7 +28,7 @@ struct TPUDetector::Impl {
 
         // Copy to Python
         auto np = py::module::import("numpy");
-        py::array input = py::cast(resized);
+        py::array_t<uint8_t> input = py::cast(resized);
         py::module coral_common = py::module::import("pycoral.adapters.common");
         coral_common.attr("set_input")(interpreter, input);
         interpreter.attr("invoke")();
@@ -66,3 +67,4 @@ std::vector<Detection> TPUDetector::detect(const cv::Mat& img) {
     }
     return dets;
 }
+TPUDetector::~TPUDetector() = default;

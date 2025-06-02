@@ -1,4 +1,10 @@
 // ================= capture/camera_capture.cpp ==================================
+#if 0
+// legacy file. not used.
+#include "capture/camera.hpp"
+// ... (파일 전체)
+#endif
+
 #include "capture/camera_capture.hpp"
 #include <chrono>
 
@@ -14,7 +20,7 @@ CameraCapture::CameraCapture(int cam_id, int width, int height, int fps, Queue& 
     frame_period_ms_ = 1000.0 / fps;
 }
 
-bool CameraCapture::grabFrame(Frame& out) {
+bool CameraCapture::grab(Frame& out) {
     cv::Mat frame;
     if (!cap_.read(frame)) {
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(frame_period_ms_)));

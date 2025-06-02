@@ -9,9 +9,9 @@ add_library(zybo_edge SHARED ${SRC_FILES} ${HDR_FILES})
 target_include_directories(zybo_edge PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_link_libraries(zybo_edge PUBLIC
-    OpenCV::opencv
-    Python3::Python
+    ${OpenCV_LIBS}
     pybind11::embed
+    ffi
 )
 
 # ----------------------------------------------------------------------------

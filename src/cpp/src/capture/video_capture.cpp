@@ -12,7 +12,7 @@ VideoCapture::VideoCapture(const std::string& path, Queue& out_q)
     frame_period_ms_ = fps > 1 ? 1000.0 / fps : 33.3;
 }
 
-bool VideoCapture::grabFrame(Frame& out) {
+bool VideoCapture::grab(Frame& out) {
     cv::Mat frame;
     if (!cap_.read(frame)) {
         // End of file – terminate outer loop
