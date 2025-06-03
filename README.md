@@ -105,16 +105,32 @@ pip install -r requirements.txt
 
 ### 4-3. C++ 모듈 빌드
 ```bash
-wget https://packages.cloud.google.com/apt/pool/coral-edge/edgetpu/libedgetpu-dev/libedgetpu-dev_2.0-20240315.0_arm64.deb  # 예시
-wget https://packages.cloud.google.com/apt/pool/coral-edge/edgetpu/libedgetpu1-std/libedgetpu1-std_2.0-20240315.0_arm64.deb
-dpkg-deb -x libedgetpu1-std_*.deb  tmp/
-dpkg-deb -x libedgetpu-dev_*.deb   tmp/
-mkdir -p third_party/edgetpu/lib   third_party/edgetpu/include
-cp -a tmp/usr/lib/*/*libedgetpu.so* third_party/edgetpu/lib/
-cp -a tmp/usr/include/edgetpu.h     third_party/edgetpu/include/
+mkdir -p ~/downloads/coral && cd ~/downloads/coral
+echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo apt-get update
+apt download libedgetpu1-std libedgetpu-dev
 
-mkdir -p build && cd build
-cmake ..
+mkdir -p ~/Workspace/Zybo-EdgeTPU/third_party/edgetpu/lib ~/Workspace/Zybo-EdgeTPU/third_party/edgetpu/include
+cd ~/Workspace/Zybo-EdgeTPU/third_party/edgetpu
+for f in ~/downloads/coral/*.deb; do dpkg-deb -x "$f" tmp; done
+mkdir -p lib include
+cp tmp/usr/lib/*/libedgetpu.so*     lib/
+cp tmp/usr/include/edgetpu.h        include/
+cd lib && ln -sf $(ls libedgetpu.so.* | head -1) libedgetpu.so && cd ..
+```
+결과 디렉터리 구조
+```bash
+third_party/edgetpu/
+├── lib/
+│   ├── libedgetpu.so -> libedgetpu.so.1  # ← 심볼릭 링크
+│   └── libedgetpu.so.1
+└── include/
+    └── edgetpu.h
+```
+```bash
+mkdir -p ../src/cpp/build && cd ../src/cpp/build
+cmake -DEDGETPU_ROOT=$(realpath ../../../third_party/edgetpu) ..
 make -j$(nproc)
 
 ./app ../model_edgetpu.tflite 0
