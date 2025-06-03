@@ -16,7 +16,9 @@ find_package(OpenCV QUIET PATHS
 # -------------------------
 if(NOT OpenCV_FOUND)
   include(FetchContent)
-  set(OPENCV_VERSION 4.9.0)         # 원하는 버전
+  set(OPENCV_VERSION 4.9.0)
+
+  # 1. 두 레포 선언
   FetchContent_Declare(opencv
     GIT_REPOSITORY https://github.com/opencv/opencv.git
     GIT_TAG        ${OPENCV_VERSION})
@@ -24,14 +26,15 @@ if(NOT OpenCV_FOUND)
     GIT_REPOSITORY https://github.com/opencv/opencv_contrib.git
     GIT_TAG        ${OPENCV_VERSION})
 
-  # OpenCV 옵션 최소화 – Python 바인딩/테스트 OFF
-  set(BUILD_opencv_python OFF CACHE BOOL "" FORCE)
-  set(BUILD_TESTS         OFF CACHE BOOL "" FORCE)
-  set(BUILD_DOCS          OFF CACHE BOOL "" FORCE)
-  set(OPENCV_ENABLE_NONFREE OFF CACHE BOOL "" FORCE)
-  set(OPENCV_EXTRA_MODULES_PATH ${opencv_contrib_SOURCE_DIR}/modules CACHE PATH "" FORCE)
+  # 2. ***소스만*** 먼저 내려받아 위치를 알아낸다
+  FetchContent_Populate(opencv_contrib)
+
+  # 3. 이제 정확한 경로가 생겼으니 캐시에 넣기
+  set(OPENCV_EXTRA_MODULES_PATH
+      "${opencv_contrib_SOURCE_DIR}/modules" CACHE PATH "" FORCE)
+
+  # 4. OpenCV & contrib 을 실제로 configure / build
   FetchContent_MakeAvailable(opencv opencv_contrib)
-  # FetchContent 가 `opencv` 타깃(opencv::opencv) 을 내보냄
 endif()
 
 # -------------------------
@@ -46,8 +49,18 @@ endif()
 # ---- Edge‑TPU runtime ----
 find_library(EDGETPU_LIB NAMES edgetpu
              HINTS ${EDGETPU_ROOT}/lib
-                   /usr/lib/x86_64-linux-gnu /usr/lib /usr/local/lib
-             REQUIRED)
+                   /usr/lib/x86_64-linux-gnu /usr/lib /usr/local/lib)
+# ↳ libedgetpu.so 심볼릭 링크가 없을 경우 .so.1 등 버전 파일을 직접 잡아 주기
+if(NOT EDGETPU_LIB)
+  file(GLOB _TPU_LIBS "${EDGETPU_ROOT}/lib/libedgetpu.so.*")
+  if(_TPU_LIBS)
+    list(GET _TPU_LIBS 0 EDGETPU_LIB)   # 첫 번째 후보 사용
+  endif()
+endif()
+# 마지막에도 없으면 오류
+if(NOT EDGETPU_LIB)
+  message(FATAL_ERROR "Edge‑TPU library (libedgetpu.so) not found in ${EDGETPU_ROOT}/lib; make sure symlink exists or pass correct EDGETPU_ROOT")
+endif()
 find_path   (EDGETPU_INC edgetpu.h
              HINTS ${EDGETPU_ROOT}/include
                    /usr/include /usr/local/include
@@ -61,20 +74,34 @@ find_path  (TFLITE_INC tensorflow/lite/interpreter.h PATHS /usr/include /usr/loc
 # 없으면 FetchContent 로 minimal 빌드
 if(NOT TFLITE_LIB OR NOT TFLITE_INC)
   include(FetchContent)
+
+  # ★ TensorFlow 2.14 소스의 lite 디렉터리만 빌드
   FetchContent_Declare(tflite
-    GIT_REPOSITORY https://github.com/tensorflow/tflite-support.git
-    GIT_TAG v0.4.5)
-  set(TFLITE_ENABLE_XNNPACK OFF CACHE BOOL "" FORCE)
-  set(TFLITE_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    GIT_REPOSITORY https://github.com/tensorflow/tensorflow.git
+    GIT_TAG        v2.14.0
+    SOURCE_SUBDIR  tensorflow/lite)
+
+  # 빌드 옵션 최소화
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+  set(TFLITE_ENABLE_RUY       OFF CACHE BOOL "" FORCE)
+  set(TFLITE_ENABLE_XNNPACK   OFF CACHE BOOL "" FORCE)
+  set(TFLITE_ENABLE_NNAPI     OFF CACHE BOOL "" FORCE)
+
   FetchContent_MakeAvailable(tflite)
-  set(TFLITE_LIB tensorflow-lite CACHE FILEPATH "")
-  set(TFLITE_INC ${tflite_SOURCE_DIR} CACHE PATH "")
+
+  # FetchContent 가 생성한 static 라이브러리 타깃을 사용
+  set(TFLITE_LIB tensorflow-lite-static)   # ← CMake 가 자동으로 만듦
+  set(TFLITE_INC ${tflite_SOURCE_DIR}      CACHE PATH "")
+endif()
+
+if(NOT IS_DIRECTORY ${TFLITE_INC})
+  message(FATAL_ERROR "TFLite headers not found! Hint: apt install libtensorflow-lite-dev \
+  or pass -DTFLITE_INC=/path/to/include -DTFLITE_LIB=/path/to/libtensorflow-lite.a")
 endif()
 
 include_directories(
-    include
-    ${TFLITE_INC}
-    ${EDGETPU_INC}
-)
+    ${PROJECT_SOURCE_DIR}/include        # 우리 헤더
+    ${TFLITE_INC}                        # <tensorflow/lite/...>
+    ${EDGETPU_INC})                      # <edgetpu.h>
 
 add_subdirectory(src)
