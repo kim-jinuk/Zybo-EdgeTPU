@@ -112,9 +112,12 @@ dpkg-deb -x libedgetpu-dev_*.deb   tmp/
 mkdir -p third_party/edgetpu/lib   third_party/edgetpu/include
 cp -a tmp/usr/lib/*/*libedgetpu.so* third_party/edgetpu/lib/
 cp -a tmp/usr/include/edgetpu.h     third_party/edgetpu/include/
-mkdir build && cd build
-cmake -DEDGETPU_ROOT=${PWD}/third_party/edgetpu ..
+
+mkdir -p build && cd build
+cmake ..
 make -j$(nproc)
+
+./app ../model_edgetpu.tflite 0
 ```
 
 ### 4-4. 데모 실행
