@@ -1,13 +1,28 @@
 #include "processing/preprocess.hpp"
-namespace preprocess {
-cv::Mat run(const cv::Mat& src) {
-    static cv::Mat k = (cv::Mat_<float>(3,3)<<0,-1,0,-1,5,-1,0,-1,0);
-    cv::Mat x; cv::filter2D(src, x, src.depth(), k);
-    cv::GaussianBlur(x, x, {7,7}, 0);
-    cv::Mat yuv; cv::cvtColor(x, yuv, cv::COLOR_BGR2YCrCb);
-    std::vector<cv::Mat> ch; cv::split(yuv, ch);
-    cv::Ptr<cv::CLAHE> c = cv::createCLAHE(2.0, {8,8});
-    c->apply(ch[0], ch[0]); cv::merge(ch, yuv);
-    cv::cvtColor(yuv, x, cv::COLOR_YCrCb2BGR);
-    return x;
-}}
+
+cv::Mat Preprocessor::enhance(const cv::Mat& src, const Options& opt) {
+    cv::Mat dst = src.clone();
+    if (opt.use_clahe) {
+        cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
+        cv::Mat lab; cv::cvtColor(dst, lab, cv::COLOR_BGR2Lab);
+        std::vector<cv::Mat> lab_planes(3);
+        cv::split(lab, lab_planes);
+        clahe->apply(lab_planes[0], lab_planes[0]);
+        cv::merge(lab_planes, lab);
+        cv::cvtColor(lab, dst, cv::COLOR_Lab2BGR);
+    }
+    if (opt.use_sharpen) {
+        cv::Mat sharp;
+        cv::GaussianBlur(dst, sharp, cv::Size(0, 0), 3);
+        cv::addWeighted(dst, 1.5, sharp, -0.5, 0, dst);
+    }
+    if (opt.use_denoise) {
+        cv::fastNlMeansDenoisingColored(dst, dst, 10, 10, 7, 21);
+    }
+    if (opt.use_unsharp) {
+        cv::Mat blurred;
+        cv::GaussianBlur(dst, blurred, cv::Size(0, 0), 1.0);
+        cv::addWeighted(dst, 1.3, blurred, -0.3, 0, dst);
+    }
+    return dst;
+}

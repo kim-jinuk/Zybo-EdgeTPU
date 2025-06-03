@@ -1,18 +1,24 @@
 #pragma once
 #include <opencv2/opencv.hpp>
-#include "utils/safe_queue.hpp"
+#include <thread>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
+#include <queue>
 
 class CameraSource {
 public:
-    CameraSource(int cam_id, SafeQueue<cv::Mat>& out, int width=640, int height=480)
-        : cap_(cam_id), q_(out) {
-        cap_.set(cv::CAP_PROP_FRAME_WIDTH,  width);
-        cap_.set(cv::CAP_PROP_FRAME_HEIGHT, height);
-    }
-    void operator()() {
-        while(true) { cv::Mat f; cap_ >> f; if(f.empty()) continue; q_.push(f); }
-    }
+    CameraSource(int device = 0, int w = 640, int h = 480);
+    ~CameraSource();
+    bool get(cv::Mat& out, int timeout_ms = 50);
+    void stop();
+
 private:
+    void capture_loop();
     cv::VideoCapture cap_;
-    SafeQueue<cv::Mat>& q_;
+    std::thread th_;
+    std::atomic<bool> running_;
+    std::mutex mtx_;
+    std::condition_variable cv_;
+    std::queue<cv::Mat> frame_q_;
 };
