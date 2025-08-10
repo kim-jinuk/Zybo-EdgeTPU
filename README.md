@@ -2,7 +2,7 @@
 30 FPS 임베디드 실시간 영상 개선·탐지·추적 파이프라인
 [![Build](https://img.shields.io/github/actions/workflow/status/your-id/zybo_eo_rt/build.yml?branch=main)](../../actions)
 
-![Demo](test_data/demo.mp4?style=centerme)
+https://github.com/user-attachments/assets/8536bfc6-1ba9-4620-b8b9-7c6d69b6f11c
 
 ---
 
